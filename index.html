@@ -337,11 +337,12 @@ https://www.tooplate.com/view/2117-infinite-loop
             </div>
             
             <div class="col-sm-12 col-md-6">
-              <form action="" method="get">
+              <form id="my-form" action="https://formspree.io/f/xgeqybqz" method="POST">
                 <input id="name" name="name" type="text" placeholder="Numele dumneavoastră" class="tm-input" required />
                 <input id="email" name="email" type="email" placeholder="Email-ul tau" class="tm-input" required />
                 <textarea id="message" name="message" rows="8" placeholder="Mesaj" class="tm-input" required></textarea>
                 <button type="submit" class="btn tm-btn-submit">Trimite</button>
+                <p style="background-color: black; padding:5px; border-radius:15px;" id="my-form-status"></p>
               </form>
             </div>
             
@@ -581,6 +582,38 @@ https://www.tooplate.com/view/2117-infinite-loop
         ]
         });
       });
+
+      var form = document.getElementById("my-form");
+    
+    async function handleSubmit(event) {
+      event.preventDefault();
+      var status = document.getElementById("my-form-status");
+      var data = new FormData(event.target);
+      fetch(event.target.action, {
+        method: form.method,
+        body: data,
+        headers: {
+            'Accept': 'application/json'
+        }
+      }).then(response => {
+        if (response.ok) {
+          status.innerHTML = "Vă mulțumim pentru trimitere!";
+          form.reset()
+        } else {
+          response.json().then(data => {
+            if (Object.hasOwn(data, 'errors')) {
+              status.innerHTML = data["errors"].map(error => error["message"]).join(", ")
+            } else {
+              status.innerHTML = "Hopa! A apărut o problemă la trimiterea formularului dvs"
+            }
+          })
+        }
+      }).catch(error => {
+        status.innerHTML = "Hopa! A apărut o problemă la trimiterea formularului dvs"
+      });
+    }
+    form.addEventListener("submit", handleSubmit)
+
     </script>
   </body>
 </html>
